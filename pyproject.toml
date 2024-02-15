@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "social media downloader"
+version = "0.1.0"
+description = ""
+authors = ["nickkitovsky <1825545+nickkitovsky@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiogram = "^3.3.0"
+pydantic-settings = "^2.1.0"
+tiktok-downloader = {git = "https://github.com/krypton-byte/tiktok-downloader"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
