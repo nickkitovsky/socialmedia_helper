@@ -1,53 +1,58 @@
-# импорты 
+# pylint: disable=C0116, C0115, C0114
+
 import asyncio
 import logging
-import time
+import sys
 
-from aiogram import Bot, Dispatcher, F, exceptions, filters, html, types
-from aiogram.types import ContentType, FSInputFile
+from aiogram import Bot, Dispatcher, html, types
+from aiogram.client.bot import DefaultBotProperties
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.enums import ParseMode
+from aiogram.types import FSInputFile
 
-import fileworker
 from config_reader import config
+from downloader import DownloadService
 
-# Включаем логирование, чтобы не пропустить важные сообщения
-logging.basicConfig(level=logging.INFO)
-
-# Для записей с типом Secret* необходимо
-# вызывать метод get_secret_value(),
-# чтобы получить настоящее содержимое вместо '*******'
-# Объект бота
-bot = Bot(token=config.bot_token.get_secret_value())
+TOKEN = config.bot_token.get_secret_value()
+default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
+bot = Bot(token=TOKEN, session=AiohttpSession(), default=default_properties)
 dp = Dispatcher()
-Command = filters.command.Command
 
 
-@dp.message(F.)
-async def exctact_url(message: types.Message):
+@dp.message()
+async def echo_handler(message: types.Message) -> None:
     data = {
         "url": "<N/A>",
     }
+    # message.entities
     entities = message.entities or []
     for item in entities:
-        if item.type in data.keys():
-            data[item.type] = item.extract(message.text)  # type: ignore
+        if item.type in data:
+            data[item.type] = item.extract_from(message.text)  # type: ignore
+
     url = html.quote(data["url"])
-    if fileworker.is_tiktok_url(url):
-        # await message.reply("Ok. i'm working, bro.. 5 sec.")
-        filename = fileworker.get_mdown(url)
+    ds = DownloadService()
+    filename = await ds.download(url)
+
+    async def publish_video(filename):
         videofile = FSInputFile(filename)
-        await message.delete()
         await bot.send_video(message.chat.id, videofile)
-        await fileworker.remove_file(filename)
+        await message.delete()
+        await ds.remove_file(filename)
+
+    if filename:
+        await publish_video(filename)
+    else:
+        ds.refresh_tiktok_services()
+        logging.error("can't download %s", url)
+        await publish_video(filename)
 
 
-# Запуск процесса поллинга новых апдейтов
-async def main():
+async def main() -> None:
+    # use pooling
     await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
-    while True:
-        try:
-            asyncio.run(main())
-        except exceptions.TelegramRetryAfter:
-            time.sleep(10)
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    asyncio.run(main())

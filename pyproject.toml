@@ -12,6 +12,10 @@ pydantic-settings = "^2.1.0"
 tiktok-downloader = {git = "https://github.com/krypton-byte/tiktok-downloader"}
 
 
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+ruff = "^0.8.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
