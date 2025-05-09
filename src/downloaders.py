@@ -4,7 +4,6 @@ from time import time
 import tiktok_downloader
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class TikTokDownloader:

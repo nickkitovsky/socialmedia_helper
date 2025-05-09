@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import pathlib
 from asyncio import sleep as asleep
 
@@ -9,6 +10,8 @@ from src.link_detector import is_tiktok_url
 
 WAIT_FOR_DELETE_FILE_SEC = 5 * 60
 
+logger = logging.getLogger(__name__)
+
 
 class GroupMessageHandler:
     def __init__(self, bot: Bot):
@@ -17,6 +20,7 @@ class GroupMessageHandler:
 
     async def handle_group_message(self, message: Message) -> None:
         if isinstance(message.text, str) and is_tiktok_url(message.text):
+            logger.debug("Handle tiktok url: %s", message.text)
             file_path = await self.tiktok.download(message.text)
             if file_path:
                 await self.bot.send_video(
@@ -31,7 +35,7 @@ class GroupMessageHandler:
         await asleep(WAIT_FOR_DELETE_FILE_SEC)
         try:
             pathlib.Path(file_path).unlink()
-        except Exception:  # noqa: BLE001
-            pass
-            # Можно логировать или игнорировать
-            # print(f"Ошибка при удалении файла {file_path}: {e}")
+            logger.debug("Delete %s with delay.", file_path)
+
+        except Exception as e:  # noqa: BLE001
+            logger.warning("File is not delete, cause %s", e)

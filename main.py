@@ -1,13 +1,18 @@
 import asyncio
+import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ParseMode
+from logger_config import setup_logging
 from src.config_reader import config
 from src.handlers import GroupMessageHandler
 
 BOT_TOKEN = config.bot_token.get_secret_value()
+
+setup_logging(debug=False)
+logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
@@ -22,4 +27,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+    logger.debug("Bot is starting.")
     asyncio.run(main())
