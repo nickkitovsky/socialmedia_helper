@@ -1,4 +1,3 @@
-# handlers.py
 import pathlib
 from asyncio import sleep as asleep
 
@@ -16,18 +15,13 @@ class GroupMessageHandler:
         self.tiktok_downloader = TikTokDownloader()
 
     async def handle_group_message(self, message: Message) -> None:
-        if not message.text:
-            return
-
-        if not is_tiktok_url(message.text):
-            return
-
-        file_path = await self.tiktok_downloader.download(message.text)
-        if file_path:
-            await self.bot.send_video(
-                chat_id=message.chat.id,
-                video=FSInputFile(file_path),
-            )
-            await message.delete()
-            await asleep(WAIT_FOR_DELETE_FILE_SEC)
-            pathlib.Path(file_path).unlink()
+        if isinstance(message.text, str) and is_tiktok_url(message.text):
+            file_path = await self.tiktok_downloader.download(message.text)
+            if file_path:
+                await self.bot.send_video(
+                    chat_id=message.chat.id,
+                    video=FSInputFile(file_path),
+                )
+                await message.delete()
+                await asleep(WAIT_FOR_DELETE_FILE_SEC)
+                pathlib.Path(file_path).unlink()
