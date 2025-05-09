@@ -31,11 +31,3 @@ class GroupMessageHandler:
             await message.delete()
             await asleep(WAIT_FOR_DELETE_FILE_SEC)
             pathlib.Path(file_path).unlink()
-
-    @staticmethod
-    async def remove_file(
-        filename: pathlib.Path | str,
-        sleeptime: int = 5 * 60,
-    ) -> None:
-        await asleep(sleeptime)
-        pathlib.Path(filename).unlink()
