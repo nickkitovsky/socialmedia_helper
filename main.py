@@ -5,9 +5,9 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ParseMode
-from logger_config import setup_logging
 from src.config_reader import config
 from src.handlers import GroupMessageHandler
+from src.logger_config import setup_logging
 
 BOT_TOKEN = config.bot_token.get_secret_value()
 

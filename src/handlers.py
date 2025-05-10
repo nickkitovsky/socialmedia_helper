@@ -5,7 +5,7 @@ from asyncio import sleep as asleep
 
 from aiogram import Bot
 from aiogram.types import FSInputFile, Message
-from downloaders import TikTokDownloader
+from src.downloaders import TikTokDownloader
 from src.link_detector import is_tiktok_url
 
 WAIT_FOR_DELETE_FILE_SEC = 5 * 60
