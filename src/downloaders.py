@@ -11,7 +11,10 @@ class TikTokDownloader:
     MIN_FILE_SIZE_BYTES = 99999
 
     def __init__(self) -> None:
-        self.services = list(tiktok_downloader.services)
+        # delete mdown
+        services_without_mdown = tiktok_downloader.services
+        services_without_mdown.pop("mdown")
+        self.services = list(services_without_mdown)
         self.tmp_dir = pathlib.Path("tmp_files")
         self._ensure_tmp_dir_exists()
 
